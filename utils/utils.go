@@ -18,6 +18,8 @@ var (
 		Bold(true).Foreground(lipgloss.Color("#b3ecf1")).PaddingTop(1).PaddingBottom(1)
 )
 
+var trollstyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFADB0"))
+
 func ShowWelcomeMessage() {
 	fmt.Println(`
    ___                           , __                                            
@@ -101,7 +103,11 @@ func MongoDB(orm *string, styling *string, language *string, database *string, p
 	if err != nil {
 		log.Fatal(err)
 	}
-	Tailwind(styling, orm, database, language, projectName)
+	if *orm == "no" {
+		fmt.Println(trollstyle.Render("Lol how else are you going to use mongodb, choose yes for mongoose"))
+	} else {
+		Tailwind(styling, orm, database, language, projectName)
+	}
 }
 
 func Mysql(orm *string, styling *string, language *string, database *string, projectName *string) {}
@@ -129,30 +135,11 @@ func Tailwind(styling *string, orm *string, database *string, language *string, 
 	}
 
 	if *language == "javascript" && *database == "mongodb" && *orm == "yes" && *styling == "no" {
-		// clone the repo
-		cmd := exec.Command("git", "clone", "https://github.com/Shivam915201/mern-js")
-		err := cmd.Run()
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
-
-		// rename the directory
-		err = os.Rename("mern-js", *projectName)
-		if err != nil {
-			fmt.Println("Error renaming directory:", err)
-			return
-		}
-
-		// remove the .git folder
-		cmd2 := exec.Command("sh", "-c", fmt.Sprintf("cd %s && git remote remove origin && rm -rf .git", *projectName))
-		err = cmd2.Run()
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
-		Spinner()
+		CloneRepo_no_tailwind_js(projectName)
+	} else if *language == "javascript" && *database == "mongodb" && *orm == "yes" && *styling == "yes" {
+		CloneRepo_yes_tailwind_js(projectName)
 	}
+
 	*styling = ""
 	*orm = ""
 	*database = ""
@@ -171,4 +158,56 @@ func Spinner() {
 	fmt.Println(style.Render("Run the backend server with cd backend && npm run server"))
 	fmt.Println(style.Render("Run the frontend server with cd frontend && npm run dev"))
 	fmt.Println(style.Render("Deploy on render or railway or vercel"))
+}
+
+func CloneRepo_yes_tailwind_js(projectName *string) {
+	// clone the repo
+	cmd := exec.Command("git", "clone", "https://github.com/Shivam915201/mern_js_tailwind")
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// rename the directory
+	err = os.Rename("mern_js_tailwind", *projectName)
+	if err != nil {
+		fmt.Println("Error renaming directory:", err)
+		return
+	}
+
+	// remove the .git folder
+	cmd2 := exec.Command("sh", "-c", fmt.Sprintf("cd %s && git remote remove origin && rm -rf .git", *projectName))
+	err = cmd2.Run()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	Spinner()
+}
+
+func CloneRepo_no_tailwind_js(projectName *string) {
+	// clone the repo
+	cmd := exec.Command("git", "clone", "https://github.com/Shivam915201/mern-js")
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// rename the directory
+	err = os.Rename("mern-js", *projectName)
+	if err != nil {
+		fmt.Println("Error renaming directory:", err)
+		return
+	}
+
+	// remove the .git folder
+	cmd2 := exec.Command("sh", "-c", fmt.Sprintf("cd %s && git remote remove origin && rm -rf .git", *projectName))
+	err = cmd2.Run()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	Spinner()
 }
